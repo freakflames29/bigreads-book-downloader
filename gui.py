@@ -2,6 +2,7 @@ import time
 import requests as rq
 from bs4 import BeautifulSoup as bs
 from tkinter import *
+from bengal_book import BengaliBook
 
 
 class Gui:
@@ -18,11 +19,12 @@ class Gui:
         self.found = Label(self.root, text="")
         self.root.geometry("450x200")
         self.output = Text(self.root, height=2, width=50)
-        self.btnClick=False
+        self.btnClick = False
 
         self.root.minsize(450, 200)
         self.root.maxsize(450, 200)
         self.root.resizable(width=False, height=False)
+
     try:
         def check_one_lib(self, book_name):
             space_removed = book_name.replace(" ", "%20")
@@ -91,44 +93,47 @@ class Gui:
             self.found.pack()
             return
 
+    def if_found(self, text, link):
+        self.found.configure(text=text)
+        self.found.pack()
+        self.output.delete("1.0", "end-1c")
+        self.output.insert(END, link)
+        self.output.pack()
+
     def find(self):
         txt = self.inp.get("1.0", "end-1c")
         if len(txt) > 0:
-            self.btnClick=True
+            self.btnClick = True
             self.buffer()
             onelib = self.check_one_lib(txt)
             if onelib:
-                text=txt.capitalize()+" Book Found!"
-                self.found.configure(text=text)
-                self.found.pack()
-                self.output.delete("1.0","end-1c")
-                self.output.insert(END, onelib)
-                self.output.pack()
+                text = txt.capitalize() + " Book Found!"
+
+                self.if_found(text, onelib)
             else:
                 pdfdrive = self.check_pdfdrive(txt)
                 if pdfdrive:
-                    text=txt.capitalize()+" Book Found!"
-                    self.found.configure(text=text)
-                    self.found.pack()
-                    self.output.delete("1.0","end-1c")
-                    self.output.insert(END, pdfdrive)
-                    self.output.pack()
+                    text = txt.capitalize() + " Book Found!"
+                    self.if_found(text, pdfdrive)
+
                 else:
                     int_arch = self.check_int_arch(txt)
                     if int_arch:
-                        text=txt.capitalize()+" Book Found!"
-                        self.found.configure(text=text)
-                        self.found.pack()
-                        self.output.delete("1.0","end-1c")
-                        self.output.insert(END, int_arch)
-                        self.output.pack()
+                        text = txt.capitalize() + " Book Found!"
+                        self.if_found(text, int_arch)
+
                     else:
-                        google = self.google_Found(txt)
-                        self.found.configure(text="Google link")
-                        self.found.pack()
-                        self.output.delete("1.0","end-1c")
-                        self.output.insert(END, google)
-                        self.output.pack()
+                        bengal_book = BengaliBook()
+                        link = bengal_book.find_book(txt)
+                        if link:
+                            text = txt.capitalize() + " Book Found!"
+                            self.if_found(text, link)
+
+                        else:
+                            google = self.google_Found(txt)
+                            text = "Google link!"
+                            self.if_found(text, google)
+
         else:
             self.found.configure(text="Enter a valid book name")
             self.found.pack()
@@ -137,7 +142,7 @@ class Gui:
         self.label = Label(self.root, text="Enter the name of the Book ")
         self.inp = Text(self.root, height=2, width=30)
         self.btn = Button(self.root, text="Find the book", command=self.find)
-        self.space_label=Label(self.root,text="  ")
+        self.space_label = Label(self.root, text="  ")
 
         self.space_label.pack()
         self.label.pack()
