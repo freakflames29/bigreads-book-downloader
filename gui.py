@@ -3,6 +3,7 @@ import requests as rq
 from bs4 import BeautifulSoup as bs
 from tkinter import *
 from bengal_book import BengaliBook
+from bde_books import Bde
 
 
 class Gui:
@@ -128,11 +129,17 @@ class Gui:
                         if link:
                             text = txt.capitalize() + " Book Found!"
                             self.if_found(text, link)
-
                         else:
-                            google = self.google_Found(txt)
-                            text = "Google link!"
-                            self.if_found(text, google)
+                            bde_books = Bde()
+                            bde_books_link = bde_books.find_book(txt)
+                            if bde_books_link:
+                                text = txt.capitalize() + " Book Found!"
+                                self.if_found(text, bde_books_link)
+
+                            else:
+                                google = self.google_Found(txt)
+                                text = "Google link!"
+                                self.if_found(text, google)
 
         else:
             self.found.configure(text="Enter a valid book name")
